@@ -1681,10 +1681,10 @@ auto Settings::getDeviceClassForDevice(GdkDevice* device) const -> InputDeviceTy
 
 auto Settings::getDeviceClassForDevice(const string& deviceName, GdkInputSource deviceSource) const
         -> InputDeviceTypeOption {
-    auto search = inputDeviceClasses.find(deviceName);
-    if (search != inputDeviceClasses.end()) {
-        return search->second.first;
-    }
+//    auto search = inputDeviceClasses.find(deviceName);
+//    if (search != inputDeviceClasses.end()) {
+//        return search->second.first;
+//    }
 
 
     InputDeviceTypeOption deviceType = InputDeviceTypeOption::Disabled;

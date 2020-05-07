@@ -169,6 +169,7 @@ static void gtk_xournal_get_preferred_width(GtkWidget* widget, gint* minimal_wid
 static void gtk_xournal_get_preferred_height(GtkWidget* widget, gint* minimal_height, gint* natural_height) {
     GtkXournal* xournal = GTK_XOURNAL(widget);
     *minimal_height = *natural_height = xournal->scrollHandling->getPreferredHeight();
+    gtk_widget_queue_resize(widget);
 }
 
 static void gtk_xournal_size_allocate(GtkWidget* widget, GtkAllocation* allocation) {
@@ -220,23 +221,23 @@ static void gtk_xournal_realize(GtkWidget* widget) {
 static void gtk_xournal_draw_shadow(GtkXournal* xournal, cairo_t* cr, int left, int top, int width, int height,
                                     bool selected) {
     if (selected) {
-        Shadow::drawShadow(cr, left - 2, top - 2, width + 4, height + 4);
+        Shadow::drawShadow(cr, left, top, width, height);
 
-        Settings* settings = xournal->view->getControl()->getSettings();
-
-        // Draw border
-        Util::cairo_set_source_rgbi(cr, settings->getBorderColor());
-        cairo_set_line_width(cr, 4.0);
-        cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
-        cairo_set_line_join(cr, CAIRO_LINE_JOIN_BEVEL);
-
-        cairo_move_to(cr, left, top);
-        cairo_line_to(cr, left, top + height);
-        cairo_line_to(cr, left + width, top + height);
-        cairo_line_to(cr, left + width, top);
-        cairo_close_path(cr);
-
-        cairo_stroke(cr);
+//        Settings* settings = xournal->view->getControl()->getSettings();
+//
+//        // Draw border
+//        Util::cairo_set_source_rgbi(cr, settings->getBorderColor());
+//        cairo_set_line_width(cr, 4.0);
+//        cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
+//        cairo_set_line_join(cr, CAIRO_LINE_JOIN_BEVEL);
+//
+//        cairo_move_to(cr, left, top);
+//        cairo_line_to(cr, left, top + height);
+//        cairo_line_to(cr, left + width, top + height);
+//        cairo_line_to(cr, left + width, top);
+//        cairo_close_path(cr);
+//
+//        cairo_stroke(cr);
     } else {
         Shadow::drawShadow(cr, left, top, width, height);
     }

@@ -152,10 +152,12 @@ void Layout::recalculate() {
     }
 
     // add space around the entire page area to accomodate older Wacom tablets with limited sense area.
-    size_t const vPadding =
-            sumIf(XOURNAL_PADDING, settings->getAddVerticalSpaceAmount(), settings->getAddVerticalSpace());
-    size_t const hPadding =
-            sumIf(XOURNAL_PADDING, settings->getAddHorizontalSpaceAmount(), settings->getAddHorizontalSpace());
+    int64_t const basePadding = this->view->control->getZoomControl()->isZoomPresentationMode() ? 0 : XOURNAL_PADDING;
+
+    int64_t const vPadding =
+            sumIf(basePadding, settings->getAddVerticalSpaceAmount(), settings->getAddVerticalSpace());
+    int64_t const hPadding =
+            sumIf(basePadding, settings->getAddHorizontalSpaceAmount(), settings->getAddHorizontalSpace());
 
     minWidth = 2 * hPadding + (widthCols.size() - 1) * XOURNAL_PADDING_BETWEEN;
     minHeight = 2 * vPadding + (heightRows.size() - 1) * XOURNAL_PADDING_BETWEEN;
@@ -184,10 +186,13 @@ void Layout::layoutPages(int width, int height) {
 
 
     // add space around the entire page area to accomodate older Wacom tablets with limited sense area.
+    // do not add spacing in presentation mode
+    int64_t const basePadding = this->view->control->getZoomControl()->isZoomPresentationMode() ? 0 : XOURNAL_PADDING;
+
     int64_t const v_padding =
-            sumIf(XOURNAL_PADDING, settings->getAddVerticalSpaceAmount(), settings->getAddVerticalSpace());
+            sumIf(basePadding, settings->getAddVerticalSpaceAmount(), settings->getAddVerticalSpace());
     int64_t const h_padding =
-            sumIf(XOURNAL_PADDING, settings->getAddHorizontalSpaceAmount(), settings->getAddHorizontalSpace());
+            sumIf(basePadding, settings->getAddHorizontalSpaceAmount(), settings->getAddHorizontalSpace());
 
     int64_t const centeringXBorder = static_cast<int64_t>(width - minWidth) / 2;
     int64_t const centeringYBorder = static_cast<int64_t>(height - minHeight) / 2;
@@ -227,7 +232,7 @@ void Layout::layoutPages(int width, int height) {
                             paddingLeft = XOURNAL_ROOM_FOR_SHADOW;
                             paddingRight = XOURNAL_PADDING_BETWEEN - XOURNAL_ROOM_FOR_SHADOW + columnPadding;
                         }
-                    } else {                                                            // not paired page mode - center
+                    } else if (!this->view->control->getZoomControl()->isZoomPresentationMode()) {                                                            // not paired page mode - center
                         paddingLeft = XOURNAL_PADDING_BETWEEN / 2 + columnPadding / 2;  // center justify
                         paddingRight = XOURNAL_PADDING_BETWEEN - paddingLeft + columnPadding / 2;
                     }
@@ -261,7 +266,9 @@ void Layout::layoutPages(int width, int height) {
     }
 }
 
-void Layout::setLayoutSize(int width, int height) { this->scrollHandling->setLayoutSize(width, height); }
+void Layout::setLayoutSize(int width, int height) {
+    this->scrollHandling->setLayoutSize(width, height);
+}
 
 void Layout::scrollRelative(double x, double y) {
     if (this->view->getControl()->getSettings()->isPresentationMode()) {
@@ -285,8 +292,16 @@ void Layout::scrollAbs(double x, double y) {
 
 
 void Layout::ensureRectIsVisible(int x, int y, int width, int height) {
-    gtk_adjustment_clamp_page(scrollHandling->getHorizontal(), x - 5, x + width + 10);
-    gtk_adjustment_clamp_page(scrollHandling->getVertical(), y - 5, y + height + 10);
+    double v = gtk_adjustment_get_upper(scrollHandling->getVertical());
+    g_warning("Y: %d, H: %f, WH: %d, MH: %d", y, v, this->view->getDisplayHeight(), minHeight);
+
+    if (this->view->control->getZoomControl()->isZoomPresentationMode()) {
+        gtk_adjustment_clamp_page(scrollHandling->getHorizontal(), x, x + width);
+        gtk_adjustment_clamp_page(scrollHandling->getVertical(), y, y + height);
+    } else {
+        gtk_adjustment_clamp_page(scrollHandling->getHorizontal(), x - 5, x + width + 10);
+        gtk_adjustment_clamp_page(scrollHandling->getVertical(), y - 5, y + height + 10);
+    }
 }
 
 
