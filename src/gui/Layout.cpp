@@ -292,9 +292,6 @@ void Layout::scrollAbs(double x, double y) {
 
 
 void Layout::ensureRectIsVisible(int x, int y, int width, int height) {
-    double v = gtk_adjustment_get_upper(scrollHandling->getVertical());
-    g_warning("Y: %d, H: %f, WH: %d, MH: %d", y, v, this->view->getDisplayHeight(), minHeight);
-
     if (this->view->control->getZoomControl()->isZoomPresentationMode()) {
         gtk_adjustment_clamp_page(scrollHandling->getHorizontal(), x, x + width);
         gtk_adjustment_clamp_page(scrollHandling->getVertical(), y, y + height);

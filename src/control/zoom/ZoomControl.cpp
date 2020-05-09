@@ -389,6 +389,13 @@ auto ZoomControl::onWidgetSizeChangedEvent(GtkWidget* widget, GdkRectangle* allo
     zoom->updateZoomPresentationValue();
     zoom->updateZoomFitValue(r);
 
+    GtkStyleContext* context = gtk_widget_get_style_context(widget);
+    if (zoom->view->getControl()->isFullscreen() && zoom->isZoomPresentationMode()) {
+        gtk_style_context_add_class(context, "fullscreen-presentation");
+    } else {
+        gtk_style_context_remove_class(context, "fullscreen-presentation");
+    }
+
     auto layout = gtk_xournal_get_layout(zoom->view->getWidget());
     layout->layoutPages(allocation->width, allocation->height);
     gtk_widget_queue_resize(zoom->view->getWidget());
