@@ -48,6 +48,10 @@ GtkToolItem>GtkBox>GtkLabel+GtkLabel+GtkButton
 }
 
 
+.fullscreen-presentation undershoot {
+	background: none;
+}
+
 
 /*  If you want to change the size of toolbar buttons try these:
 *   All toolbars:
