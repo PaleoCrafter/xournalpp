@@ -75,7 +75,7 @@ auto InputContext::handle(GdkEvent* sourceEvent) -> bool {
     // Add the device to the list of known devices if it is currently unknown
     GdkDevice* sourceDevice = gdk_event_get_source_device(sourceEvent);
     GdkInputSource inputSource = gdk_device_get_source(sourceDevice);
-    if (inputSource != GDK_SOURCE_KEYBOARD && gdk_device_get_device_type(sourceDevice) != GDK_DEVICE_TYPE_MASTER &&
+    if (inputSource != GDK_SOURCE_KEYBOARD && inputSource != GDK_SOURCE_TABLET_PAD && gdk_device_get_device_type(sourceDevice) != GDK_DEVICE_TYPE_MASTER &&
         this->knownDevices.find(string(event.deviceName)) == this->knownDevices.end()) {
 
         this->knownDevices.insert(string(event.deviceName));
@@ -123,7 +123,7 @@ auto InputContext::handle(GdkEvent* sourceEvent) -> bool {
     }
 
     // handle keyboard
-    if (event.deviceClass == INPUT_DEVICE_KEYBOARD) {
+    if (inputSource == GDK_SOURCE_TABLET_PAD || event.deviceClass == INPUT_DEVICE_KEYBOARD) {
         return this->keyboardHandler->handle(event);
     }
 
